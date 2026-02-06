@@ -48,24 +48,13 @@
 
 		// Debounce save by 1 second
 		saveTimeout = setTimeout(async () => {
-			try {
-				console.log('Saving pins to database:', currentPins);
-				const formData = new FormData();
-				formData.append('pins', JSON.stringify(currentPins));
+			const formData = new FormData();
+			formData.append('pins', JSON.stringify(currentPins));
 
-				const response = await fetch('?/savePins', {
-					method: 'POST',
-					body: formData
-				});
-
-				if (response.ok) {
-					console.log('Pins saved successfully');
-				} else {
-					console.error('Failed to save pins');
-				}
-			} catch (error) {
-				console.error('Failed to save pins:', error);
-			}
+			const response = await fetch('?/savePins', {
+				method: 'POST',
+				body: formData
+			});
 		}, 1000) as unknown as number;
 	});
 
@@ -159,7 +148,29 @@
 	}
 </script>
 
-<div class="container" onclick={handleBoardClick}>
+<div
+	class="container"
+	onclick={handleBoardClick}
+	role="button"
+	tabindex="0"
+	onkeydown={(e) => {
+		// Don't trigger if focus is on an input, button, or other interactive element
+		const target = e.target as HTMLElement;
+		if (
+			target.tagName === 'INPUT' ||
+			target.tagName === 'BUTTON' ||
+			target.tagName === 'TEXTAREA'
+		) {
+			return;
+		}
+
+		if (e.key === 'Enter' || e.key === ' ') {
+			e.preventDefault();
+			handleBoardClick(e as unknown as MouseEvent);
+		}
+	}}
+	aria-label="Mind board canvas - click to add pin"
+>
 	<!-- SVG layer for connections -->
 	<svg class="connections-layer">
 		{#each pins as pin, i (i)}
