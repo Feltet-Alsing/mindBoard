@@ -57,5 +57,20 @@ export async function initDB() {
         throw error;
     }
 
+    // Pins table for mindboard state
+    try {
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS pins (
+                user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+                pins_data JSONB NOT NULL DEFAULT '[]',
+                updated_at TIMESTAMP DEFAULT NOW()
+            )
+        `);
+        console.log('Pins table initialized successfully');
+    } catch (error) {
+        console.error('Error initializing pins table:', error);
+        throw error;
+    }
+
 
 }

@@ -2,6 +2,8 @@
 	import { page } from '$app/state';
 	import { enhance } from '$app/forms';
 	import MindBoard from '$lib/components/MindBoard.svelte';
+
+	let { data } = $props();
 </script>
 
 <div class="page-wrapper">
@@ -16,7 +18,7 @@
 			</form>
 		</div>
 	</div>
-	<MindBoard />
+	<MindBoard initialPins={data.pins || []} />
 </div>
 
 <style>

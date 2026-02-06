@@ -2,7 +2,7 @@
 	import Pin from './Pin.svelte';
 	import PinCreationMenu from './PinCreationMenu.svelte';
 
-	type Pin = {
+	type PinType = {
 		position: {
 			left: string;
 			top: string;
@@ -16,13 +16,58 @@
 		connections: number[]; // Array of pin indices this pin is connected to
 	};
 
-	let pins: Pin[] = $state([]);
+	let { initialPins = [] }: { initialPins?: PinType[] } = $props();
+
+	let pins: PinType[] = $state(initialPins);
 	let showCreationMenu = $state(false);
 	let menuPosition = $state({ x: 0, y: 0 });
 	let isConnecting = $state(false);
 	let connectingFrom = $state<number | null>(null);
 	let connectionPreview = $state<{ x: number; y: number } | null>(null);
 	let justFinishedConnection = $state(false);
+	let saveTimeout: number | null = null;
+	let mountTimestamp = Date.now();
+
+	// Log loaded pins once
+	console.log('Loaded pins from database:', $state.snapshot(pins));
+
+	// Auto-save pins whenever they change
+	$effect(() => {
+		// Track changes to pins array
+		const currentPins = $state.snapshot(pins);
+
+		// Skip saves during the first 500ms after mount (initial render)
+		if (Date.now() - mountTimestamp < 500) {
+			return;
+		}
+
+		// Clear existing timeout
+		if (saveTimeout !== null) {
+			clearTimeout(saveTimeout);
+		}
+
+		// Debounce save by 1 second
+		saveTimeout = setTimeout(async () => {
+			try {
+				console.log('Saving pins to database:', currentPins);
+				const formData = new FormData();
+				formData.append('pins', JSON.stringify(currentPins));
+
+				const response = await fetch('?/savePins', {
+					method: 'POST',
+					body: formData
+				});
+
+				if (response.ok) {
+					console.log('Pins saved successfully');
+				} else {
+					console.error('Failed to save pins');
+				}
+			} catch (error) {
+				console.error('Failed to save pins:', error);
+			}
+		}, 1000) as unknown as number;
+	});
 
 	function handleBoardClick(event: MouseEvent) {
 		// Don't open menu if we just finished a connection or are in connecting mode
@@ -42,7 +87,7 @@
 	}
 
 	function createPin(x: number, y: number, label: string, color: string) {
-		const pin: Pin = {
+		const pin: PinType = {
 			position: { left: x.toString(), top: y.toString() },
 			height: '40px',
 			width: '40px',
