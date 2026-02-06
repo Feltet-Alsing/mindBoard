@@ -95,9 +95,9 @@
 		tabindex="0"
 		onkeydown={(e) => {
 			if (e.key === 'Escape') closeModal();
-			if (e.key === 'Enter' || e.key === ' ') {
+			if ((e.key === 'Enter' || e.key === ' ') && e.target === e.currentTarget) {
 				e.preventDefault();
-				if (e.target === e.currentTarget) saveAndClose();
+				saveAndClose();
 			}
 		}}
 		aria-label="Close modal"
@@ -236,12 +236,21 @@
 	}
 
 	.notebook-page {
-		background: linear-gradient(to right, #f8f8f8 0%, #fff 50px, #fff 100%);
-		border-left: 50px solid #f8f8f8;
-		border-radius: 8px;
+		background:
+			linear-gradient(
+				to right,
+				transparent 0px,
+				transparent 70px,
+				rgba(230, 90, 90, 0.15) 70px,
+				rgba(230, 90, 90, 0.15) 72px,
+				transparent 72px
+			),
+			linear-gradient(#faf8f5, #f7f4ef);
+		border-radius: 12px;
 		box-shadow:
-			0 10px 40px rgba(0, 0, 0, 0.2),
-			0 0 0 1px rgba(0, 0, 0, 0.05);
+			0 20px 60px rgba(0, 0, 0, 0.3),
+			inset 0 0 0 1px rgba(0, 0, 0, 0.05),
+			inset -2px 0 8px rgba(0, 0, 0, 0.05);
 		position: relative;
 		overflow: hidden;
 	}
@@ -249,18 +258,38 @@
 	.notebook-page::before {
 		content: '';
 		position: absolute;
-		left: 40px;
+		left: 0;
 		top: 0;
 		bottom: 0;
-		width: 2px;
-		background: linear-gradient(to bottom, #ff6b6b 0%, #ff6b6b 100%);
-		opacity: 0.3;
+		width: 70px;
+		background:
+			radial-gradient(circle at 35px 30px, rgba(0, 0, 0, 0.08) 4px, transparent 5px),
+			radial-gradient(circle at 35px 80px, rgba(0, 0, 0, 0.08) 4px, transparent 5px),
+			radial-gradient(circle at 35px 130px, rgba(0, 0, 0, 0.08) 4px, transparent 5px),
+			radial-gradient(circle at 35px 180px, rgba(0, 0, 0, 0.08) 4px, transparent 5px),
+			radial-gradient(circle at 35px 230px, rgba(0, 0, 0, 0.08) 4px, transparent 5px),
+			linear-gradient(to right, #e8e3db 0%, #f0ebe3 100%);
+		border-right: 2px solid rgba(200, 190, 180, 0.3);
+	}
+
+	.notebook-page::after {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background:
+			radial-gradient(ellipse at 10% 10%, rgba(255, 255, 255, 0.5) 0%, transparent 50%),
+			radial-gradient(ellipse at 90% 90%, rgba(0, 0, 0, 0.03) 0%, transparent 50%);
+		pointer-events: none;
 	}
 
 	.notebook-header {
 		display: flex;
-		justify-content: space-between;
+		justify-content: flex-end;
 		align-items: center;
+		gap: 8px;
 		padding: 16px 24px;
 		background: transparent;
 	}
@@ -283,15 +312,18 @@
 	}
 
 	.pin-settings {
-		padding: 0 60px 24px 60px;
-		border-bottom: 2px solid #e0e0e0;
+		padding: 0 60px 24px 90px;
+		border-bottom: 2px solid rgba(200, 180, 160, 0.3);
 		margin-bottom: 16px;
+		position: relative;
+		z-index: 1;
 	}
 
 	.pin-settings h3 {
 		margin: 0 0 16px 0;
 		font-size: 18px;
-		color: #333;
+		color: #4a3a2a;
+		font-family: 'Georgia', 'Times New Roman', serif;
 	}
 
 	.settings-row {
@@ -315,15 +347,17 @@
 
 	.settings-input {
 		padding: 8px 12px;
-		border: 1px solid #ddd;
+		border: 1px solid rgba(200, 180, 160, 0.4);
 		border-radius: 6px;
 		font-size: 14px;
-		color: #333;
+		color: #3a3228;
+		background: rgba(255, 255, 255, 0.5);
 	}
 
 	.settings-input:focus {
 		outline: none;
-		border-color: #00bcd4;
+		border-color: #a89880;
+		background: rgba(255, 255, 255, 0.8);
 	}
 
 	.color-grid-small {
@@ -436,39 +470,43 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		padding: 0 60px 24px 60px;
+		padding: 32px 60px 24px 90px;
 		overflow-y: auto;
+		position: relative;
+		z-index: 1;
 	}
 
 	.notebook-title {
-		font-size: 32px;
-		font-weight: 600;
+		font-size: 28px;
+		font-weight: 700;
 		border: none;
 		background: transparent;
-		color: #1a1a1a;
-		padding: 16px 0;
-		margin-bottom: 24px;
-		font-family: 'Georgia', serif;
-		border-bottom: 2px solid #e0e0e0;
+		color: #2c2416;
+		padding: 0 0 12px 0;
+		margin-bottom: 20px;
+		font-family: 'Georgia', 'Times New Roman', serif;
+		border-bottom: 2px solid rgba(200, 180, 160, 0.4);
+		letter-spacing: -0.5px;
 	}
 
 	.notebook-title::placeholder {
-		color: #ccc;
+		color: #bfb5a8;
+		font-style: italic;
 	}
 
 	.notebook-title:focus {
 		outline: none;
-		border-bottom-color: #999;
+		border-bottom-color: #a89880;
 	}
 
 	.notebook-lines {
 		flex: 1;
 		position: relative;
-		background: repeating-linear-gradient(
+		background-image: repeating-linear-gradient(
 			transparent,
-			transparent 31px,
-			#e8e8e8 31px,
-			#e8e8e8 32px
+			transparent 29px,
+			rgba(180, 160, 140, 0.25) 29px,
+			rgba(180, 160, 140, 0.25) 30px
 		);
 		min-height: 400px;
 	}
@@ -481,14 +519,15 @@
 		background: transparent;
 		resize: none;
 		font-size: 16px;
-		line-height: 32px;
-		color: #333;
-		font-family: 'Georgia', serif;
+		line-height: 30px;
+		color: #3a3228;
+		font-family: 'Georgia', 'Times New Roman', serif;
 		padding: 0;
+		padding-top: 2px;
 	}
 
 	.notebook-textarea::placeholder {
-		color: #bbb;
+		color: #c0b5a8;
 		font-style: italic;
 	}
 
@@ -500,9 +539,11 @@
 		display: flex;
 		gap: 12px;
 		justify-content: flex-end;
-		padding: 20px 60px;
-		border-top: 1px solid #e0e0e0;
-		background: rgba(248, 248, 248, 0.5);
+		padding: 20px 60px 20px 90px;
+		border-top: 1px solid rgba(200, 180, 160, 0.3);
+		background: linear-gradient(to bottom, rgba(245, 240, 235, 0.5), rgba(240, 235, 230, 0.7));
+		position: relative;
+		z-index: 1;
 	}
 
 	.save-btn,
@@ -517,25 +558,25 @@
 	}
 
 	.save-btn {
-		background-color: #2c3e50;
-		color: white;
+		background-color: #5a4a3a;
+		color: #faf8f5;
 	}
 
 	.save-btn:hover {
-		background-color: #34495e;
+		background-color: #6b5a4a;
 		transform: translateY(-2px);
-		box-shadow: 0 6px 20px rgba(44, 62, 80, 0.3);
+		box-shadow: 0 6px 20px rgba(90, 74, 58, 0.4);
 	}
 
 	.cancel-btn {
 		background-color: transparent;
-		color: #7f8c8d;
-		border: 1px solid #ddd;
+		color: #7a6a58;
+		border: 1px solid rgba(200, 180, 160, 0.4);
 	}
 
 	.cancel-btn:hover {
-		background-color: #f5f5f5;
-		color: #555;
-		border-color: #bbb;
+		background-color: rgba(240, 235, 230, 0.5);
+		color: #5a4a3a;
+		border-color: rgba(180, 160, 140, 0.6);
 	}
 </style>
