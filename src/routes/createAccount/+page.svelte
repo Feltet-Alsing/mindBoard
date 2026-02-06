@@ -5,8 +5,8 @@
 
 <div class="container">
 	<div class="card">
-		<h1>Welcome Back</h1>
-		<p class="subtitle">Sign in to your account</p>
+		<h1>Create Account</h1>
+		<br />
 
 		{#if page.form?.error}
 			<div class="error-message">
@@ -14,22 +14,21 @@
 			</div>
 		{/if}
 
-		<form method="POST" use:enhance action="?/login">
+		<form use:enhance method="POST" action="?/createUser">
 			<label>
 				<span>Username</span>
-				<input type="text" name="username" placeholder="Enter username" required />
+				<input name="username" type="text" placeholder="Enter username" required />
 			</label>
-
 			<label>
 				<span>Password</span>
-				<input type="password" name="password" placeholder="Enter password" required />
+				<input name="password" type="password" placeholder="Enter password" required />
 			</label>
 
-			<button type="submit">Sign In</button>
+			<button type="submit">Create Account</button>
 		</form>
 
 		<div class="footer-link">
-			Don't have an account? <a href="/createAccount">Create one</a>
+			Already have an account? <a href="/">Sign in</a>
 		</div>
 	</div>
 </div>

@@ -1,0 +1,26 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    background: linear-gradient(135deg, #e8e0d5 0%, #d4cfc4 100%);
+    min-height: 100vh;
+}
+
+body {
+    font-family: 'Segoe UI', 'Trebuchet MS', 'Lucida Sans Unicode', sans-serif;
+    color: #4a4a4a;
+}
+
+:root {
+    --primary-beige: #e8e0d5;
+    --secondary-beige: #d4cfc4;
+    --dark-grey: #4a4a4a;
+    --medium-grey: #6b6b6b;
+    --light-grey: #f5f3f0;
+    --border-color: #c4bfb6;
+    --error-red: #c97064;
+    --success-green: #7d9d7a;
+}
