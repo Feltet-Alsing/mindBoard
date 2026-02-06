@@ -98,11 +98,11 @@
 		const boardCoords = screenToBoard(screenX, screenY);
 
 		// Store board coordinates for pin creation, and absolute screen coords for menu positioning
-		menuPosition = { 
+		menuPosition = {
 			x: event.clientX, // Absolute screen X for fixed positioning
 			y: event.clientY, // Absolute screen Y for fixed positioning
 			boardX: boardCoords.x, // Board coordinates for pin creation
-			boardY: boardCoords.y 
+			boardY: boardCoords.y
 		};
 		showCreationMenu = true;
 	}
