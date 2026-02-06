@@ -28,25 +28,17 @@
 	let saveTimeout: number | null = null;
 	let mountTimestamp = Date.now();
 
-	// Log loaded pins once
-	console.log('Loaded pins from database:', $state.snapshot(pins));
-
-	// Auto-save pins whenever they change
 	$effect(() => {
-		// Track changes to pins array
 		const currentPins = $state.snapshot(pins);
 
-		// Skip saves during the first 500ms after mount (initial render)
 		if (Date.now() - mountTimestamp < 500) {
 			return;
 		}
 
-		// Clear existing timeout
 		if (saveTimeout !== null) {
 			clearTimeout(saveTimeout);
 		}
 
-		// Debounce save by 1 second
 		saveTimeout = setTimeout(async () => {
 			const formData = new FormData();
 			formData.append('pins', JSON.stringify(currentPins));
@@ -229,14 +221,16 @@
 
 <style>
 	.container {
-		min-height: 75vh;
-		min-width: 75vw;
+		height: 75vh;
+		width: 100%;
+		max-width: 100%;
 		background-image:
 			linear-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px),
 			linear-gradient(90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
 		background-size: 20px 20px;
 		border-style: solid;
 		position: relative;
+		overflow: hidden;
 	}
 
 	.connections-layer {
