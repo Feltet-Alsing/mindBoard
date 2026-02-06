@@ -16,12 +16,14 @@
 		isOpen = $bindable(false),
 		pin = $bindable(),
 		pins = [],
-		currentIndex = -1
+		currentIndex = -1,
+		onClose
 	}: {
 		isOpen: boolean;
 		pin: PinType;
 		pins?: PinType[];
 		currentIndex?: number;
+		onClose?: () => void;
 	} = $props();
 
 	let localTitle = $state(pin?.title || '');
@@ -54,6 +56,7 @@
 
 	function closeModal() {
 		isOpen = false;
+		onClose?.();
 	}
 
 	function saveAndClose() {

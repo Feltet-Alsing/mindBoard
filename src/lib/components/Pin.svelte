@@ -1,6 +1,4 @@
 <script lang="ts">
-	import PinModal from './PinModal.svelte';
-
 	type PinType = {
 		position: {
 			left: string;
@@ -22,6 +20,7 @@
 		onFinishConnection,
 		onCancelConnection,
 		onUpdatePreview,
+		onOpenModal,
 		pins = [],
 		pinIndex = -1
 	}: {
@@ -31,13 +30,13 @@
 		onFinishConnection: () => void;
 		onCancelConnection: () => void;
 		onUpdatePreview: (x: number, y: number) => void;
+		onOpenModal?: () => void;
 		pins?: PinType[];
 		pinIndex?: number;
 	} = $props();
 
 	let isDragging = $state(false);
 	let hasMoved = $state(false);
-	let isModalOpen = $state(false);
 	let isOutsideBounds = $state(false);
 	let isConnecting = $state(false);
 	let justDeleted = $state(false);
@@ -177,7 +176,7 @@
 		}
 
 		if (!hasMoved) {
-			isModalOpen = true;
+			onOpenModal?.();
 		}
 		hasMoved = false;
 	}
@@ -202,8 +201,6 @@
 		{/if}
 	</div>
 </button>
-
-<PinModal bind:pin bind:isOpen={isModalOpen} {pins} currentIndex={pinIndex} />
 
 <style>
 	button {

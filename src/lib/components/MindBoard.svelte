@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Pin from './Pin.svelte';
 	import PinCreationMenu from './PinCreationMenu.svelte';
+	import PinModal from './PinModal.svelte';
 
 	type PinType = {
 		position: {
@@ -36,6 +37,8 @@
 	let panStartOffset = $state({ x: 0, y: 0 });
 	let spacePressed = $state(false);
 	let didPan = $state(false);
+	let isAnyModalOpen = $state(false);
+	let openModalPinIndex = $state<number | null>(null);
 
 	// Convert screen coordinates to board coordinates
 	function screenToBoard(screenX: number, screenY: number) {
@@ -172,7 +175,7 @@
 
 	// Zoom handler
 	function handleWheel(e: WheelEvent) {
-		if (e.ctrlKey || e.metaKey) {
+		if (!isAnyModalOpen && (e.ctrlKey || e.metaKey)) {
 			e.preventDefault();
 
 			const container = e.currentTarget as HTMLElement;
@@ -196,7 +199,7 @@
 
 	// Pan handlers
 	function handleMouseDown(e: MouseEvent) {
-		if ((spacePressed && e.button === 0) || e.button === 1) {
+		if (!isAnyModalOpen && ((spacePressed && e.button === 0) || e.button === 1)) {
 			e.preventDefault();
 			isPanning = true;
 			didPan = false;
@@ -348,6 +351,10 @@
 					onFinishConnection={() => finishConnection(i)}
 					onCancelConnection={cancelConnection}
 					onUpdatePreview={updateConnectionPreview}
+					onOpenModal={() => {
+						openModalPinIndex = i;
+						isAnyModalOpen = true;
+					}}
 					{pins}
 					pinIndex={i}
 				/>
@@ -361,6 +368,19 @@
 			y={menuPosition.y * zoom + pan.y}
 			onConfirm={handleConfirmPin}
 			onCancel={handleCancelPin}
+		/>
+	{/if}
+
+	{#if openModalPinIndex !== null && pins[openModalPinIndex]}
+		<PinModal
+			bind:pin={pins[openModalPinIndex]}
+			isOpen={true}
+			{pins}
+			currentIndex={openModalPinIndex}
+			onClose={() => {
+				openModalPinIndex = null;
+				isAnyModalOpen = false;
+			}}
 		/>
 	{/if}
 </div>
