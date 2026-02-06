@@ -1,4 +1,6 @@
 <script lang="ts">
+	import PinModal from './PinModal.svelte';
+
 	type PinType = {
 		position: {
 			left: string;
@@ -6,12 +8,38 @@
 		};
 		height: string;
 		width: string;
+		title: string;
+		content: string;
+		color: string;
+		label: string;
+		connections: number[];
 	};
 
-	let { pin = $bindable() }: { pin: PinType } = $props();
+	let {
+		pin = $bindable(),
+		onDelete,
+		onStartConnection,
+		onFinishConnection,
+		onCancelConnection,
+		onUpdatePreview,
+		pins = [],
+		pinIndex = -1
+	}: {
+		pin: PinType;
+		onDelete: () => void;
+		onStartConnection: () => void;
+		onFinishConnection: () => void;
+		onCancelConnection: () => void;
+		onUpdatePreview: (x: number, y: number) => void;
+		pins?: PinType[];
+		pinIndex?: number;
+	} = $props();
 
 	let isDragging = $state(false);
 	let hasMoved = $state(false);
+	let isModalOpen = $state(false);
+	let isOutsideBounds = $state(false);
+	let isConnecting = $state(false);
 	let offsetX = $state(0);
 	let offsetY = $state(0);
 	let startX = $state(0);
@@ -19,8 +47,15 @@
 	const DRAG_THRESHOLD = 5; // pixels
 
 	function startDrag(event: MouseEvent) {
-		console.log('Start drag');
 		event.stopPropagation();
+
+		// If shift is held, start connection mode
+		if (event.shiftKey) {
+			isConnecting = true;
+			onStartConnection();
+			return;
+		}
+
 		isDragging = true;
 		hasMoved = false;
 
@@ -39,6 +74,17 @@
 	}
 
 	function onDrag(event: MouseEvent) {
+		// Update connection preview position
+		if (event.shiftKey) {
+			const button = document.querySelector('button[title="pin"]') as HTMLElement;
+			if (button) {
+				const container = button.parentElement as HTMLElement;
+				const rect = container.getBoundingClientRect();
+				onUpdatePreview(event.clientX - rect.left, event.clientY - rect.top);
+			}
+			return;
+		}
+
 		if (!isDragging) return;
 		event.preventDefault();
 
@@ -58,32 +104,65 @@
 		const container = button.parentElement as HTMLElement;
 		const rect = container.getBoundingClientRect();
 
+		const newLeft = event.clientX - rect.left - offsetX;
+		const newTop = event.clientY - rect.top - offsetY;
+
+		// Check if pin is outside container bounds
+		isOutsideBounds = newLeft < 0 || newTop < 0 || newLeft > rect.width || newTop > rect.height;
+
 		pin.position = {
-			left: (event.clientX - rect.left - offsetX).toString(),
-			top: (event.clientY - rect.top - offsetY).toString()
+			left: newLeft.toString(),
+			top: newTop.toString()
 		};
 	}
 
 	function stopDrag(event: MouseEvent) {
+		// Check if we're finishing a connection (shift key is held)
+		if (event.shiftKey && isConnecting) {
+			event.stopPropagation();
+			event.preventDefault();
+			onFinishConnection();
+			isConnecting = false;
+			return;
+		}
+
 		if (isDragging && hasMoved) {
-			if (!hasMoved) {
-				// This was a single click, not a drag
-				console.log('Pin clicked! Open window here');
-				// TODO: Open information window
+			// Delete pin if dragged outside container
+			if (isOutsideBounds) {
+				onDelete();
+				return;
 			}
 
 			event.stopPropagation();
 			event.preventDefault();
 		}
 		isDragging = false;
+		isOutsideBounds = false;
+		isConnecting = false;
+	}
+
+	function handleMouseUp(event: MouseEvent) {
+		// If shift is held and we're in connecting mode, finish the connection to this pin
+		if (event.shiftKey && !isDragging) {
+			event.stopPropagation();
+			event.preventDefault();
+			onFinishConnection();
+			isConnecting = false;
+		}
 	}
 
 	function handleClick(event: MouseEvent) {
 		event.stopPropagation();
 		event.preventDefault();
-		if (hasMoved) {
+
+		// Check if we're finishing a connection
+		if (event.shiftKey) {
+			onFinishConnection();
 			return;
-		} else {
+		}
+
+		if (!hasMoved) {
+			isModalOpen = true;
 		}
 		hasMoved = false;
 	}
@@ -94,17 +173,22 @@
 <button
 	title="pin"
 	onmousedown={startDrag}
+	onmouseup={handleMouseUp}
 	onclick={handleClick}
 	style="left: {pin.position.left}px; top: {pin.position.top}px;"
 >
 	<div
 		class="pin"
-		style="
-    width: {pin.width}; 
-    height: {pin.height};
-    "
-	></div>
+		class:outside={isOutsideBounds}
+		style="width: {pin.width}; height: {pin.height}; background-color: {pin.color};"
+	>
+		{#if pin.label}
+			<span class="pin-label">{pin.label}</span>
+		{/if}
+	</div>
 </button>
+
+<PinModal bind:pin bind:isOpen={isModalOpen} {pins} currentIndex={pinIndex} />
 
 <style>
 	button {
@@ -118,7 +202,33 @@
 
 	.pin {
 		border-style: solid;
-		background-color: aqua;
 		border-radius: 100%;
+		transition: background-color 0.2s;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	}
+
+	.pin.outside {
+		background-color: #ff6b6b !important;
+		opacity: 0.7;
+	}
+
+	.pin-label {
+		font-size: 10px;
+		font-weight: 600;
+		color: white;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+		text-align: center;
+		max-width: 80%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrapbackground-color 0.2s;
+	}
+
+	.pin.outside {
+		background-color: #ff6b6b;
+		opacity: 0.7;
 	}
 </style>
