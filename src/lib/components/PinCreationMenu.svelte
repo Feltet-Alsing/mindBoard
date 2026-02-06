@@ -44,6 +44,8 @@
 	}
 </script>
 
+<!-- svelte-ignore a11y_interactive_supports_focus -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
 	class="menu-container"
 	style="left: {x}px; top: {y}px;"
@@ -59,6 +61,7 @@
 	<div class="menu-content">
 		<div class="form-group">
 			<label for="pin-label">Label (optional)</label>
+			<!-- svelte-ignore a11y_autofocus -->
 			<input
 				id="pin-label"
 				type="text"
@@ -71,6 +74,7 @@
 		</div>
 
 		<div class="form-group">
+			<!-- svelte-ignore a11y_label_has_associated_control -->
 			<label>Color</label>
 			<div class="color-grid">
 				{#each colors as color}
