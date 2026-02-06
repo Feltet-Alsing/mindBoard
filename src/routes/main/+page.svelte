@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { enhance } from '$app/forms';
-	import CreateNote from '$lib/components/CreateNote.svelte';
-	import { getNotes } from '$lib/db/notes.remote';
+	import MindBoard from '$lib/components/MindBoard.svelte';
 </script>
 
 <div class="page-wrapper">
@@ -17,24 +16,7 @@
 			</form>
 		</div>
 	</div>
-
-	<div class="content">
-		<div class="notes-section">
-			<h2>Your Notes</h2>
-			<div class="notes-grid">
-				{#each await getNotes() as note}
-					<a href="/main/notes/{note.notes_id}">
-						<div class="note-card">
-							<h3>{note.title}</h3>
-							<p class="note-content">{note.content}</p>
-							<span class="note-date">{new Date(note.created_at).toLocaleDateString()}</span>
-						</div>
-					</a>
-				{/each}
-				<CreateNote />
-			</div>
-		</div>
-	</div>
+	<MindBoard />
 </div>
 
 <style>
