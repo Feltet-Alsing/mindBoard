@@ -40,6 +40,7 @@
 	let isModalOpen = $state(false);
 	let isOutsideBounds = $state(false);
 	let isConnecting = $state(false);
+	let justDeleted = $state(false);
 	let offsetX = $state(0);
 	let offsetY = $state(0);
 	let startX = $state(0);
@@ -74,6 +75,9 @@
 	}
 
 	function onDrag(event: MouseEvent) {
+		// Stop immediately if not dragging
+		if (!isDragging && !event.shiftKey) return;
+
 		// Update connection preview position
 		if (event.shiftKey) {
 			const button = document.querySelector('button[title="pin"]') as HTMLElement;
@@ -123,12 +127,17 @@
 			event.preventDefault();
 			onFinishConnection();
 			isConnecting = false;
+			isDragging = false;
 			return;
 		}
 
 		if (isDragging && hasMoved) {
 			// Delete pin if dragged outside container
 			if (isOutsideBounds) {
+				isDragging = false;
+				isOutsideBounds = false;
+				hasMoved = false;
+				justDeleted = true;
 				onDelete();
 				return;
 			}
@@ -138,7 +147,7 @@
 		}
 		isDragging = false;
 		isOutsideBounds = false;
-		isConnecting = false;
+		// Don't reset hasMoved here - let handleClick consume it
 	}
 
 	function handleMouseUp(event: MouseEvent) {
@@ -152,6 +161,12 @@
 	}
 
 	function handleClick(event: MouseEvent) {
+		// Don't handle clicks if we just deleted
+		if (justDeleted) {
+			justDeleted = false;
+			return;
+		}
+
 		event.stopPropagation();
 		event.preventDefault();
 
