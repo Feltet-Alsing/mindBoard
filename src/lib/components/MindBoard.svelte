@@ -21,7 +21,7 @@
 
 	let pins: PinType[] = $state(initialPins);
 	let showCreationMenu = $state(false);
-	let menuPosition = $state({ x: 0, y: 0 });
+	let menuPosition = $state({ x: 0, y: 0, boardX: 0, boardY: 0 });
 	let isConnecting = $state(false);
 	let connectingFrom = $state<number | null>(null);
 	let connectionPreview = $state<{ x: number; y: number } | null>(null);
@@ -94,10 +94,16 @@
 		const screenX = event.clientX - rect.left;
 		const screenY = event.clientY - rect.top;
 
-		// Convert screen coordinates to board coordinates
+		// Convert screen coordinates to board coordinates for pin creation
 		const boardCoords = screenToBoard(screenX, screenY);
 
-		menuPosition = { x: boardCoords.x, y: boardCoords.y };
+		// Store board coordinates for pin creation, and absolute screen coords for menu positioning
+		menuPosition = { 
+			x: event.clientX, // Absolute screen X for fixed positioning
+			y: event.clientY, // Absolute screen Y for fixed positioning
+			boardX: boardCoords.x, // Board coordinates for pin creation
+			boardY: boardCoords.y 
+		};
 		showCreationMenu = true;
 	}
 
@@ -117,7 +123,7 @@
 	}
 
 	function handleConfirmPin(label: string, color: string) {
-		createPin(menuPosition.x, menuPosition.y, label, color);
+		createPin(menuPosition.boardX, menuPosition.boardY, label, color);
 		showCreationMenu = false;
 	}
 
@@ -364,8 +370,8 @@
 
 	{#if showCreationMenu}
 		<PinCreationMenu
-			x={menuPosition.x * zoom + pan.x}
-			y={menuPosition.y * zoom + pan.y}
+			x={menuPosition.x}
+			y={menuPosition.y}
 			onConfirm={handleConfirmPin}
 			onCancel={handleCancelPin}
 		/>

@@ -103,7 +103,7 @@
 
 <style>
 	.menu-container {
-		position: absolute;
+		position: fixed;
 		background: white;
 		border-radius: 8px;
 		box-shadow:
